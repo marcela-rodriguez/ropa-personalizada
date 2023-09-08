@@ -18,3 +18,10 @@ def create_admin(user_info: PeticionParaCrearAdministrador) -> Administrador:
 
 def consultar_administradores() -> List[Administrador]:
     return administradores
+
+def consultar_administrador_por_id(id_administrador:str)-> Administrador:
+    for administrador in administradores:
+        if id_administrador == administrador.id:
+            return administrador
+    raise Exception(f"No encontre un administrador con el id {id_administrador}")
+        

@@ -1,6 +1,6 @@
 from admin.domain.casos_de_uso.administrador import create_admin
 from admin.domain.models.dto import PeticionParaCrearAdministrador
-from admin.domain.casos_de_uso.administrador import consultar_administradores 
+from admin.domain.casos_de_uso.administrador import consultar_administradores, consultar_administrador_por_id
 import json # se importa la libreria json
 from flask import Flask, Response, request # se importan las clases Flask y Response
 
@@ -16,7 +16,7 @@ def pepito_dasdas():
     ) # Se retorna un objeto Response que tiene el cuerpo de la respuesta y el status code3
 
 @app.route("/admin", methods=["POST"]) 
-def create_user():
+def servicio_crear_administrador():
     cuerpo_peticion = request.get_json()
     user_info=PeticionParaCrearAdministrador(
             nombre=cuerpo_peticion["nombre"],
@@ -30,13 +30,26 @@ def create_user():
     )
 
 @app.route("/admin", methods=["GET"]) 
-def consultarUsuario():
+def servicio_consultar_administradores():
     lista_respuesta=[]
-    for a in consultar_administradores():
-        lista_respuesta.append(a.__dict__)
+    for administrador in consultar_administradores():
+        lista_respuesta.append(administrador.__dict__)
     
     return Response(
-        response=json.dumps({"usuarios creados": lista_respuesta}),
+        response=json.dumps({"administradores": lista_respuesta}),
         status=201
       )
   
+@app.route("/admin/<id_administrador>", methods=["GET"])
+def servicio_consultar_administrador(id_administrador:str):
+    print(id_administrador)
+    try:
+        return Response(
+            response=json.dumps(consultar_administrador_por_id(id_administrador=id_administrador).__dict__),
+            status=201
+        )
+    except Exception:
+        return Response(
+            response=json.dumps({"error": "Administrador no encontrado"}),
+            status=404
+        )
