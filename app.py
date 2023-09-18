@@ -1,5 +1,6 @@
-from admin.domain.casos_de_uso.administrador import create_admin
-from admin.domain.models.dto import PeticionParaCrearAdministrador
+from admin.domain.casos_de_uso.administrador import create_admin,iniciar_sesion
+from admin.domain.models.dto import PeticionParaCrearAdministrador,PeticionParaLogin
+from admin.domain.models.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
 from admin.domain.casos_de_uso.administrador import consultar_administradores, consultar_administrador_por_id
 import json # se importa la libreria json
 from flask import Flask, Response, request # se importan las clases Flask y Response
@@ -23,11 +24,16 @@ def servicio_crear_administrador():
             correo=cuerpo_peticion["correo"],
             contraseña=cuerpo_peticion["contraseña"],
         )
-    administrador = create_admin(user_info=user_info)
-    return Response(
-        response=json.dumps({"usuario_creado": administrador.__dict__}),
-        status=201
-    )
+    try:
+        administrador = create_admin(user_info=user_info)
+        return Response(
+            response=json.dumps({"usuario_creado": administrador.__dict__}),
+            status=201
+        )
+    except CorreoYaRegistrado:
+        return Response(
+            response=json.dumps({"mensaje":"correo ya registrado"})
+        )
 
 @app.route("/admin", methods=["GET"]) 
 def servicio_consultar_administradores():
@@ -48,8 +54,35 @@ def servicio_consultar_administrador(id_administrador:str):
             response=json.dumps(consultar_administrador_por_id(id_administrador=id_administrador).__dict__),
             status=201
         )
-    except Exception:
+    except ErrorAdministradorNoEncontrado:
         return Response(
             response=json.dumps({"error": "Administrador no encontrado"}),
             status=404
         )
+    
+@app.route("/admin/login", methods=["POST"])
+def login():
+    cuerpo_peticion=request.get_json()
+    datos_user=PeticionParaLogin(
+        correo=cuerpo_peticion["correo"],
+        contraseña=cuerpo_peticion["contraseña"]
+    )
+
+    try:
+        iniciar_sesion(datos_user=datos_user)
+        return Response(
+            response=json.dumps({}),
+            status=200
+        )
+    except ErrorAdministradorNoEncontrado:
+        return Response(
+            response=json.dumps({"error": "administrador no encontrado"}),
+            status=404
+        )
+    except ContraseñaIncorrecta:
+        return Response(
+            response=json.dumps({"error":"contraseña incorrecta"}),
+            status=404
+        )
+
+    
