@@ -4,3 +4,4 @@ class Administrador:
         self.nombre = nombre
         self.correo = correo
         self.contraseña = contraseña
+      

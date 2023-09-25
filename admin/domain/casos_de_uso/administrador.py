@@ -1,7 +1,7 @@
 from typing import List
-from admin.domain.models.dto import PeticionParaCrearAdministrador,PeticionParaLogin
-from admin.domain.models.models import Administrador
-from admin.domain.models.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
+from admin.domain.modelos.dto import PeticionParaCrearAdministrador,PeticionParaLogin
+from admin.domain.modelos.models import Administrador
+from admin.domain.modelos.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
 from commons.utils import crear_id
 
 administradores: List[Administrador] = []

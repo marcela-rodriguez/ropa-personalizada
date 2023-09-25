@@ -1,6 +1,8 @@
 from admin.domain.casos_de_uso.administrador import create_admin,iniciar_sesion
-from admin.domain.models.dto import PeticionParaCrearAdministrador,PeticionParaLogin
-from admin.domain.models.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
+from cliente.domain.casos_de_uso.cliente import crear_cliente
+from admin.domain.modelos.dto import PeticionParaCrearAdministrador,PeticionParaLogin
+from cliente.domain.modelos.dto import PeticionParaCrearUsuario
+from admin.domain.modelos.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
 from admin.domain.casos_de_uso.administrador import consultar_administradores, consultar_administrador_por_id
 import json # se importa la libreria json
 from flask import Flask, Response, request # se importan las clases Flask y Response
@@ -85,4 +87,18 @@ def login():
             status=404
         )
 
-    
+@app.route("/cliente",methods=["POST"])
+def servicio_crear_comprador():
+    cuerpo_peticion = request.get_json()
+    user=PeticionParaCrearUsuario(
+        nombre=cuerpo_peticion["nombre"],
+        correo=cuerpo_peticion["correo"],
+        contraseña=cuerpo_peticion["contraseña"], 
+        direccion=cuerpo_peticion["direccion"],
+        telefono=cuerpo_peticion["telefono"]
+    )
+    cliente= crear_cliente(user=user)
+    return Response(
+            response=json.dumps({"usuario_creado": cliente.__dict__}),
+            status=201
+        )
