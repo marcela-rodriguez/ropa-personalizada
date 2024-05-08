@@ -3,9 +3,9 @@ from cliente.domain.modelos.modelos import Cliente
 from cliente.domain.modelos.dto import PeticionParaCrearUsuario,PeticionParaLogin
 from cliente.domain.modelos.excepciones import ErrorClienteNoEncontrado,ErrorClienteYaRegistrado, ContraseñaIncorrecta,CorreoYaRegistrado
 from commons.utils import crear_id
-
+#casos de uso
 clientes: list[Cliente] =[]
-
+#funcion para crear los clientes y validad si el cliente ya esta registrado
 def crear_cliente(user:PeticionParaCrearUsuario)-> Cliente:
     
     id_cliente = crear_id()
@@ -24,7 +24,7 @@ def crear_cliente(user:PeticionParaCrearUsuario)-> Cliente:
     return cliente
 
 
-
+#funcion para validar si el usuario ya existe por medio del correo y contraseña incorrecta
 def iniciar_sesion(datos_user: PeticionParaLogin) -> Cliente:
     for cliente in clientes:
         print(f"correo: {cliente.correo}, cont: {cliente.contraseña}")
