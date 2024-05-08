@@ -1,15 +1,18 @@
 from admin.domain.casos_de_uso.administrador import create_admin,iniciar_sesion
-from cliente.domain.casos_de_uso.cliente import crear_cliente
+from cliente.domain.casos_de_uso.cliente import crear_cliente,iniciar_sesion
 from admin.domain.modelos.dto import PeticionParaCrearAdministrador,PeticionParaLogin
-from cliente.domain.modelos.dto import PeticionParaCrearUsuario
+from cliente.domain.modelos.dto import PeticionParaCrearUsuario, PeticionParaLogin
 from admin.domain.modelos.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
+from cliente.domain.modelos.excepciones import ErrorClienteNoEncontrado,ErrorClienteYaRegistrado,ContraseñaIncorrecta,CorreoYaRegistrado
 from admin.domain.casos_de_uso.administrador import consultar_administradores, consultar_administrador_por_id
 import json # se importa la libreria json
-from flask import Flask, Response, request # se importan las clases Flask y Response
+from flask import Flask, Response, request# se importan las clases Flask y Response
+from flask_cors import CORS
 
 app = Flask(__name__) # Se crea una instancia de la clase Flask
+CORS(app, origins=["*"])
 
-# Utilizamos el decorador route de la aplicacon flask 
+# Utilizamos el decorador route de la aplicacion flask 
 # para definir un servicio en el recurso /users y el metodo POST
 @app.route("/users", methods=["POST"]) 
 def pepito_dasdas():
@@ -89,6 +92,7 @@ def login():
 
 @app.route("/cliente",methods=["POST"])
 def servicio_crear_comprador():
+    print("iniciando al servicio")
     cuerpo_peticion = request.get_json()
     user=PeticionParaCrearUsuario(
         nombre=cuerpo_peticion["nombre"],
@@ -97,8 +101,40 @@ def servicio_crear_comprador():
         direccion=cuerpo_peticion["direccion"],
         telefono=cuerpo_peticion["telefono"]
     )
-    cliente= crear_cliente(user=user)
-    return Response(
+    try:
+        cliente= crear_cliente(user=user)
+        return Response(
             response=json.dumps({"usuario_creado": cliente.__dict__}),
             status=201
+        )
+    except ErrorClienteYaRegistrado:
+        return Response(
+            response=json.dumps({"error": "El cliente ya exixiste"}),
+            status=400
+        )
+
+@app.route("/cliente/login", methods=["POST"])
+def loginCliente():
+    cuerpo_peticion=request.get_json()
+    datos_user=PeticionParaLogin(
+        correo=cuerpo_peticion["correo"],
+        contraseña=cuerpo_peticion["contraseña"]
+    )
+
+    try:
+        iniciar_sesion(datos_user=datos_user)
+        return Response(
+            response=json.dumps({"mensaje": "ingreso exito"}),
+            status=200
+
+        )
+    except ErrorClienteNoEncontrado:
+        return Response(
+            response=json.dumps({"error": "cliente no encontrado"}),
+            status=404
+        )
+    except ContraseñaIncorrecta:
+        return Response(
+            response=json.dumps({"error":"contraseña incorrecta"}),
+            status=404
         )

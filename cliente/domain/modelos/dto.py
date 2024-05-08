@@ -5,3 +5,8 @@ class PeticionParaCrearUsuario:
         self.contraseña = contraseña
         self.direccion = direccion
         self.telefono = telefono
+
+class PeticionParaLogin:
+    def __init__(self,correo: str,contraseña:str) -> None:
+        self.contraseña=contraseña
+        self.correo=correo
