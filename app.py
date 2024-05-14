@@ -103,16 +103,16 @@ def servicio_crear_Cliente():
         contraseña=cuerpo_peticion["contraseña"], 
         direccion=cuerpo_peticion["direccion"],
         telefono=cuerpo_peticion["telefono"]
-    )#controlas las excepciones
+    )#controlas las excepciones para crear el usuario y saber si ya esta creado al momento del registro
     try:
         cliente= crear_cliente(user=user)
         return Response(
-            response=json.dumps({"usuario_creado": cliente.__dict__}),
+            response=json.dumps({"usuario_creado": cliente.__dict__}),#se retorna mensaje cuando el usario es creado
             status=201
         )
     except ErrorClienteYaRegistrado:
         return Response(
-            response=json.dumps({"error": "El cliente ya exixiste"}),
+            response=json.dumps({"error": "El cliente ya exixiste"}),# se retorna un mesaje si el usuario ya esta creado
             status=400
         )
 # se crea el servicio de login para cliente en el recurso cliente/login con metodo POST
@@ -122,21 +122,21 @@ def loginCliente():
     datos_user=PeticionParaLogin(
         correo=cuerpo_peticion["correo"],
         contraseña=cuerpo_peticion["contraseña"]
-    )#controlas las excepciones
+    )#controlas las excepciones para validar que ingreso correctamente,si el usuario no esta registrado o si la contraseña es incorrecta.
     try:
         iniciar_sesion(datos_user=datos_user)
         return Response(
-            response=json.dumps({"mensaje": "ingreso exito"}),
+            response=json.dumps({"mensaje": "ingreso exito"}),#retorna mensaje cuando es correcto el ingreso del usuario.
             status=200
 
         )
     except ErrorClienteNoEncontrado:
         return Response(
-            response=json.dumps({"error": "cliente no encontrado"}),
+            response=json.dumps({"error": "cliente no registrado"}), #retorna un errror de cliente no encontrado o no regitrado.
             status=404
         )
     except ContraseñaIncorrecta:
         return Response(
-            response=json.dumps({"error":"contraseña incorrecta"}),
+            response=json.dumps({"error":"contraseña incorrecta"}),#retorna mesnaje cuando la contrasena es incorrecta.
             status=404
         )
