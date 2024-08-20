@@ -1,44 +1,40 @@
 from typing import List
-from admin.domain.modelos.dto import PeticionParaCrearAdministrador,PeticionParaLogin
+from admin.domain.modelos import dto as dto_admi
 from admin.domain.modelos.models import Administrador
-from admin.domain.modelos.excepciones import ErrorAdministradorNoEncontrado,ContraseñaIncorrecta,CorreoYaRegistrado
+from admin.domain.modelos.excepciones import ErrorAdministradorNoEncontrado, ContraseñaIncorrecta, CorreoYaRegistrado
 from commons.utils import crear_id
+from bases_de_datos import administrador_db as repositorio_admin
 
-administradores: List[Administrador] = []
 
-def create_admin(user_info: PeticionParaCrearAdministrador) -> Administrador:
-    for administrador in administradores:
+def create_admin(user_info: dto_admi.PeticionParaCrearAdministrador) -> Administrador:
+    for administrador in repositorio_admin.consultar_lista_administradores():
         if user_info.correo == administrador.correo:
             raise CorreoYaRegistrado()
-        
-    id_administrador = crear_id() 
+
+    id_administrador = crear_id()
     administrador = Administrador(
-        id=id_administrador, 
+        id=id_administrador,
         nombre=user_info.nombre,
         correo=user_info.correo,
         contraseña=user_info.contraseña
     )
-    administradores.append(administrador)
+    repositorio_admin.guardar_administrador(administrador=administrador)
     return administrador
 
+
 def consultar_administradores() -> List[Administrador]:
-    return administradores
+    return repositorio_admin.consultar_lista_administradores()
 
-def consultar_administrador_por_id(id_administrador:str)-> Administrador:
-    for administrador in administradores:
-        if id_administrador == administrador.id:
-            return administrador
-    raise ErrorAdministradorNoEncontrado(f"No encontre un administrador con el id {id_administrador}")
 
-def iniciar_sesion(datos_user: PeticionParaLogin)-> Administrador:
-    for administrador in administradores:
-        if datos_user.correo==administrador.correo:
-            if datos_user.contraseña==administrador.contraseña:
-                return administrador
-            raise ContraseñaIncorrecta(f"contraseña incorrecta{datos_user.contraseña}")
+def consultar_administrador_por_id(id_administrador: str) -> Administrador:
+    return repositorio_admin.consultar_administrador_id(id_administrador=id_administrador)
+
+
+def login_administrador(datos_user: dto_admi.PeticionParaLogin) -> Administrador:
+    a = repositorio_admin.consultar_administrador_correo(correo=datos_user.correo)
+    if datos_user.correo == a.correo:
+        if datos_user.contraseña == a.contraseña:
+            return a
+        raise ContraseñaIncorrecta(f"contraseña incorrecta{datos_user.contraseña}")
 
     raise ErrorAdministradorNoEncontrado(f"No se encontro el administrados con este correo{datos_user.correo}")
-   
-         
-
-        

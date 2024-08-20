@@ -1,7 +1,10 @@
-class ErrorClienteNoEncontrado(Exception):
+class  ErrorClienteNoEncontrado(Exception):
     ...
+
+
 class ErrorClienteYaRegistrado(Exception):
     ...
+
 
 class ContraseñaIncorrecta(Exception):
     ...

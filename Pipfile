@@ -6,8 +6,11 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-cors = "*"
+sqlalchemy = "*"
+pymysql = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.11"
